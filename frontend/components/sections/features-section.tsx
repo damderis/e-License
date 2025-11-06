@@ -10,18 +10,18 @@ interface Feature {
 const features: Feature[] = [
   {
     icon: <FileText className="h-6 w-6 text-primary" />,
-    title: "1. Submit Application",
-    description: "Fill out the online form with your personal information and license requirements"
+    title: "1. Hantar Permohonan",
+    description: "Isi borang dalam talian dengan maklumat peribadi dan keperluan lesen anda"
   },
   {
     icon: <Clock className="h-6 w-6 text-primary" />,
-    title: "2. Review Process",
-    description: "Our team will review your application and verify all submitted documents"
+    title: "2. Proses Semakan",
+    description: "Pasukan kami akan menyemak permohonan anda dan mengesahkan semua dokumen yang dihantar"
   },
   {
     icon: <CheckCircle className="h-6 w-6 text-primary" />,
-    title: "3. Get Approved",
-    description: "Receive your license approval notification and download your official license"
+    title: "3. Dapatkan Kelulusan",
+    description: "Terima notifikasi kelulusan lesen dan muat turun lesen rasmi anda"
   }
 ]
 
@@ -29,7 +29,7 @@ export function FeaturesSection() {
   return (
     <section className="py-16">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center text-foreground mb-12">How It Works</h2>
+        <h2 className="text-3xl font-bold text-center text-foreground mb-12">Langkah Permohonan</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <Card key={index}>

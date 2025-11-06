@@ -4,6 +4,7 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { useAuth } from "@/hooks/use-firebase"
 import { useToast } from "@/hooks/use-toast"
+import { uploadFileToStorage } from "@/lib/file-upload"
 
 export interface ApplyFormData {
   // Personal Info
@@ -19,6 +20,7 @@ export interface ApplyFormData {
   lokasiPasar: string
   jenisJualan: Array<{ category: string; description: string }>
   pelanPasar: string
+  pelanPasarFile?: File | null
   jumlahLot: string
   // Hawker License
   hawkerType: string
@@ -28,6 +30,7 @@ export interface ApplyFormData {
   vehicleType: string
   vehicleRegNo: string
   placeImageUrl: string
+  placeImageFile?: File | null
   // Agreement
   agreedToTerms: boolean
 }
@@ -55,6 +58,7 @@ const initialFormData: ApplyFormData = {
   vehicleType: "",
   vehicleRegNo: "",
   placeImageUrl: "",
+  placeImageFile: null,
   // Agreement
   agreedToTerms: false,
 }
@@ -178,6 +182,31 @@ export function useApplyForm() {
 
     setLoading(true)
     try {
+      // Upload image file if exists
+      let imageUrl = formData.placeImageUrl
+      if (formData.placeImageFile) {
+        const timestamp = Date.now()
+        const fileName = `${timestamp}_${formData.placeImageFile.name}`
+        const uploadPath = `applications/${user?.uid}/${fileName}`
+        
+        imageUrl = await uploadFileToStorage(formData.placeImageFile, uploadPath, (progress) => {
+          // You can add progress tracking here if needed
+          console.log(`Upload progress: ${progress.progress}%`)
+        })
+      }
+
+      // Upload pasar plan file if exists
+      let pelanPasarUrl = formData.pelanPasar
+      if (formData.pelanPasarFile) {
+        const timestamp = Date.now()
+        const fileName = `pasar_plan_${timestamp}_${formData.pelanPasarFile.name}`
+        const uploadPath = `applications/${user?.uid}/${fileName}`
+        
+        pelanPasarUrl = await uploadFileToStorage(formData.pelanPasarFile, uploadPath, (progress) => {
+          console.log(`Pasar plan upload progress: ${progress.progress}%`)
+        })
+      }
+
       await addDoc(collection(db, "applications"), {
         userId: user?.uid,
         userEmail: user?.email,
@@ -190,12 +219,13 @@ export function useApplyForm() {
           gender: formData.gender,
         },
         // Pasar License (only if user wants to apply)
+        applyForPasar: formData.applyForPasar,
         ...(formData.applyForPasar && {
           pasarLicense: {
             jenisPasar: formData.jenisPasar,
             lokasiPasar: formData.lokasiPasar,
             jenisJualan: formData.jenisJualan,
-            pelanPasar: formData.pelanPasar,
+            pelanPasar: pelanPasarUrl,
             jumlahLot: formData.jumlahLot,
           }
         }),
@@ -206,7 +236,7 @@ export function useApplyForm() {
           workingHours: formData.workingHours,
           vehicleType: formData.vehicleType,
           vehicleRegNo: formData.vehicleRegNo,
-          placeImageUrl: formData.placeImageUrl,
+          placeImageUrl: imageUrl,
         },
         agreedToTerms: formData.agreedToTerms,
         status: "pending",

@@ -8,8 +8,8 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Government Licensing Portal",
-  description: "Apply for market and hawker licenses online",
+  title: "Portal Permohonan Lesen",
+  description: "Mohon lesen Pasar dan Penjaja secara dalam talian",
   generator: "v0.app",
 }
 

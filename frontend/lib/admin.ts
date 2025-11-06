@@ -6,7 +6,6 @@
 export const ADMIN_EMAILS = [
   'awanaics@gmail.com',
   // Add more admin emails here as needed
-  // 'admin2@example.com',
 ] as const
 
 /**

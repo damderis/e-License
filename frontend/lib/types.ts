@@ -10,9 +10,12 @@ export interface PersonalInfo {
 }
 
 export interface MarketLicense {
-  marketType: string
-  location: string
-  productType: string
+  applyForPasar: boolean
+  jenisPasar: string
+  lokasiPasar: string
+  jenisJualan: Array<{ category: string; description: string }>
+  pelanPasar: string
+  jumlahLot: string
 }
 
 export interface HawkerLicense {
@@ -30,7 +33,8 @@ export interface Application {
   userId: string
   userEmail: string
   personalInfo: PersonalInfo
-  marketLicense?: MarketLicense
+  applyForPasar: boolean
+  pasarLicense?: MarketLicense
   hawkerLicense?: HawkerLicense
   agreedToTerms: boolean
   status: ApplicationStatus

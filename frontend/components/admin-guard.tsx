@@ -70,7 +70,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
             </div>
             <CardTitle className="text-xl">Access Denied</CardTitle>
             <CardDescription>
-              You don't have admin privileges to access this page.
+              You don&apos;t have admin privileges to access this page.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

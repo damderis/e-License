@@ -66,10 +66,10 @@ export function PersonalInfoStep({ formData, updateFormData }: PersonalInfoStepP
               <SelectValue placeholder="Pilih bangsa" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Chinese">Cina</SelectItem>
-              <SelectItem value="Indian">India</SelectItem>
-              <SelectItem value="Malay">Melayu</SelectItem>
-              <SelectItem value="Other">Lain-lain</SelectItem>
+            <SelectItem value="Melayu">Melayu</SelectItem>
+            <SelectItem value="Cina">Cina</SelectItem>
+            <SelectItem value="India">India</SelectItem>
+            <SelectItem value="Lain-lain">Lain-lain</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -80,9 +80,8 @@ export function PersonalInfoStep({ formData, updateFormData }: PersonalInfoStepP
               <SelectValue placeholder="Pilih jantina" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="male">Lelaki</SelectItem>
-              <SelectItem value="female">Perempuan</SelectItem>
-              <SelectItem value="other">Lain-lain</SelectItem>
+              <SelectItem value="Lelaki">Lelaki</SelectItem>
+              <SelectItem value="Wanita">Wanita</SelectItem>
             </SelectContent>
           </Select>
         </div>

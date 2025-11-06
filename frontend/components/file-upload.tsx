@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState, useRef } from "react"
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import { storage } from "@/lib/firebase"
 import { Button } from "@/components/ui/button"
@@ -11,77 +9,67 @@ import { Upload, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface FileUploadProps {
-  onUploadComplete: (url: string) => void
-  currentFile?: string
+  onFileSelect: (file: File | null) => void
+  currentFile?: File | null
+  onUploadComplete?: (url: string) => void // Optional for backward compatibility
 }
 
-export function FileUpload({ onUploadComplete, currentFile }: FileUploadProps) {
+export function FileUpload({ onFileSelect, currentFile, onUploadComplete }: FileUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [preview, setPreview] = useState<string | null>(currentFile || null)
+  const [preview, setPreview] = useState<string | null>(null)
   const { toast } = useToast()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Create preview URL when file is selected
+  React.useEffect(() => {
+    if (currentFile) {
+      const previewUrl = URL.createObjectURL(currentFile)
+      setPreview(previewUrl)
+      return () => URL.revokeObjectURL(previewUrl)
+    } else {
+      setPreview(null)
+    }
+  }, [currentFile])
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
     // Validate file type
-    if (!file.type.startsWith("image/")) {
+    if (!file.type.startsWith("image/") && !file.type.includes("pdf")) {
       toast({
-        title: "Error",
-        description: "Please upload an image file",
+        title: "Ralat",
+        description: "Sila muat naik gambar atau PDF file",
         variant: "destructive",
       })
       return
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
       toast({
-        title: "Error",
-        description: "File size must be less than 5MB",
+        title: "Ralat",
+        description: "Fail saiz mesti kurang dari 10MB",
         variant: "destructive",
       })
       return
     }
 
-    setUploading(true)
-    setProgress(0)
-
-    const storageRef = ref(storage, `applications/${Date.now()}_${file.name}`)
-    const uploadTask = uploadBytesResumable(storageRef, file)
-
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        setProgress(progress)
-      },
-      (error) => {
-        console.error("[v0] Upload error:", error)
-        toast({
-          title: "Error",
-          description: "Failed to upload file",
-          variant: "destructive",
-        })
-        setUploading(false)
-      },
-      async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
-        setPreview(downloadURL)
-        onUploadComplete(downloadURL)
-        setUploading(false)
-        toast({
-          title: "Success",
-          description: "File uploaded successfully",
-        })
-      },
-    )
+    // Store file locally and notify parent
+    onFileSelect(file)
+    toast({
+      title: "Fail Dipilih",
+      description: "Fail dipilih berjaya dimuat naik.",
+    })
   }
 
   const handleRemove = () => {
     setPreview(null)
-    onUploadComplete("")
+    onFileSelect(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
   }
 
   return (
@@ -89,10 +77,11 @@ export function FileUpload({ onUploadComplete, currentFile }: FileUploadProps) {
       {!preview ? (
         <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
           <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-sm text-muted-foreground mb-4">Upload an image of your place of operation</p>
+          <p className="text-sm text-muted-foreground mb-4">Muat naik gambar atau PDF lokasi operasi</p>
           <input
+            ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,application/pdf"
             onChange={handleFileChange}
             disabled={uploading}
             className="hidden"
@@ -100,17 +89,25 @@ export function FileUpload({ onUploadComplete, currentFile }: FileUploadProps) {
           />
           <label htmlFor="file-upload">
             <Button type="button" variant="outline" disabled={uploading} asChild>
-              <span>{uploading ? "Uploading..." : "Choose File"}</span>
+              <span>{uploading ? "Muat naik..." : "Pilih Fail"}</span>
             </Button>
           </label>
         </div>
       ) : (
         <div className="relative border rounded-lg p-4">
           <div className="flex items-center gap-4">
-            <img src={preview || "/placeholder.svg"} alt="Preview" className="h-20 w-20 object-cover rounded" />
+            {currentFile?.type.includes('pdf') ? (
+              <div className="h-20 w-20 bg-red-100 flex items-center justify-center rounded">
+                <span className="text-red-600 font-bold text-xs">PDF</span>
+              </div>
+            ) : (
+              <img src={preview || "/placeholder.svg"} alt="Preview" className="h-20 w-20 object-cover rounded" />
+            )}
             <div className="flex-1">
-              <p className="text-sm font-medium text-foreground">Image uploaded</p>
-              <p className="text-xs text-muted-foreground">Click remove to change</p>
+              <p className="text-sm font-medium text-foreground">
+                {currentFile?.type.includes('pdf') ? 'Fail PDF' : 'Gambar'} dipilih
+              </p>
+              <p className="text-xs text-muted-foreground">Klik hapus untuk menukar</p>
             </div>
             <Button type="button" variant="ghost" size="icon" onClick={handleRemove}>
               <X className="h-4 w-4" />
@@ -122,7 +119,7 @@ export function FileUpload({ onUploadComplete, currentFile }: FileUploadProps) {
       {uploading && (
         <div className="space-y-2">
           <Progress value={progress} />
-          <p className="text-xs text-muted-foreground text-center">{Math.round(progress)}% uploaded</p>
+          <p className="text-xs text-muted-foreground text-center">{Math.round(progress)}% dimuat naik</p>
         </div>
       )}
     </div>

@@ -15,6 +15,7 @@ interface PasarLicenseStepProps {
     lokasiPasar: string
     jenisJualan: Array<{ category: string; description: string }>
     pelanPasar: string
+    pelanPasarFile?: File | null
     jumlahLot: string
   }
   updateFormData: (field: string, value: any) => void
@@ -68,10 +69,10 @@ export function PasarLicenseStep({
                     <SelectValue placeholder="Pilih jenis pasar" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pasar-pagi">Pasar Pagi</SelectItem>
-                    <SelectItem value="pasar-malam">Pasar Malam</SelectItem>
-                    <SelectItem value="pasar-lambak">Pasar Lambak</SelectItem>
-                    <SelectItem value="pasar-sehari">Pasar Sehari</SelectItem>
+                    <SelectItem value="Pasar Pagi">Pasar Pagi</SelectItem>
+                    <SelectItem value="Pasar Malam">Pasar Malam</SelectItem>
+                    <SelectItem value="Pasar Lambak">Pasar Lambak</SelectItem>
+                    <SelectItem value="Pasar Sehari">Pasar Sehari</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -129,9 +130,9 @@ export function PasarLicenseStep({
                         <SelectValue placeholder="Pilih kategori" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="makanan">Makanan</SelectItem>
-                        <SelectItem value="minuman">Minuman</SelectItem>
-                        <SelectItem value="lain-lain">Lain-lain</SelectItem>
+                        <SelectItem value="Makanan">Makanan</SelectItem>
+                        <SelectItem value="Minuman">Minuman</SelectItem>
+                        <SelectItem value="Lain-lain">Lain-lain</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -161,8 +162,9 @@ export function PasarLicenseStep({
             <div className="space-y-2">
               <Label>Pelan Pasar</Label>
               <FileUpload
+                onFileSelect={(file) => updateFormData("pelanPasarFile", file)}
                 onUploadComplete={(url) => updateFormData("pelanPasar", url)}
-                currentFile={formData.pelanPasar}
+                currentFile={formData.pelanPasarFile}
               />
               <p className="text-xs text-muted-foreground">
                 Muat naik gambar atau PDF pelan pasar
